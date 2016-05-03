@@ -1,14 +1,15 @@
+
 package server
 
 import (
 	"net/http"
 
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/mux"
-
-	"github.com/vjscjp/api4/core/controllers"
+		"github.com/vjscjp/api4/core/controllers"
 	"github.com/vjscjp/api4/core/controllers/app"
 	"github.com/vjscjp/api4/core/controllers/host"
+	"github.com/codegangsta/negroni"
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 const (
@@ -30,7 +31,16 @@ func InitRoutes() *negroni.Negroni {
 	muxRouter.HandleFunc(ListApps, app.ListApps).Methods("GET")
 	muxRouter.HandleFunc(HostPorts, host.GetHostPorts).Methods("GET")
 	muxRouter.HandleFunc(HostPort, host.GetHostPort).Methods("GET")
+	
+	cor := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "CONNECT"},
+		AllowedHeaders:   []string{"*"},
+	})
+	
 	n := negroni.New(
+		negroni.NewStatic(http.Dir("public")),
+		cor,
 		&CookieAuth{},
 	)
 	n.UseHandler(muxRouter)
@@ -38,5 +48,6 @@ func InitRoutes() *negroni.Negroni {
 }
 
 func Status(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	controllers.ServeJsonResponseWithCode(w, map[string]string{"Status": "OK"}, http.StatusOK)
 }
