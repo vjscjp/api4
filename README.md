@@ -1,1 +1,2 @@
-# api4
+# shipped-utils
+Marathon Rest API Utility
