@@ -6,15 +6,16 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/CiscoCloud/shipped-utils/core"
+	"github.com/CiscoCloud/shipped-utils/core/controllers"
 	gcontext "github.com/gorilla/context"
-	"github.com/vjscjp/api4/core"
-	"github.com/vjscjp/api4/core/controllers"
 )
 
 const (
 	CONTEXT_USER     = "user"
 	CONTEXT_USER_KEY = "pass"
 	CONTEXT_API      = "api"
+	TOKEN            = "X-Token"
 )
 
 func GetUser(r *http.Request) *core.User {
@@ -42,6 +43,7 @@ type Login struct {
 }
 
 func LogIn(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("IN LOGIN")
 	cookie, _ := ReadCookie(r)
 	b, e := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -64,12 +66,6 @@ func LogIn(w http.ResponseWriter, r *http.Request) {
 		controllers.ServeJsonResponseWithCode(w, result, status)
 		return
 	}
-
-	cookie[CONTEXT_USER] = user.ID
-	cookie[CONTEXT_USER_KEY] = user.Pass
-	cookie[CONTEXT_API] = user.Api
-
-	SetCookie(w, cookie)
 	SetUser(r, &user)
 
 	//Check Marathon Api call to validate User credentials
@@ -84,6 +80,11 @@ func LogIn(w http.ResponseWriter, r *http.Request) {
 		controllers.ServeJsonResponseWithCode(w, &Login{401, "Invalid Credentials", nil, ""}, status)
 		return
 	}
+	cookie[CONTEXT_USER] = user.ID
+	cookie[CONTEXT_USER_KEY] = user.Pass
+	cookie[CONTEXT_API] = user.Api
+	SetCookie(w, cookie)
+
 	var apps []core.ListApp
 	result.StatusCode = 200
 	result.Status = "OK"
@@ -93,7 +94,7 @@ func LogIn(w http.ResponseWriter, r *http.Request) {
 	result.Apps = apps
 	//temp solution as UI is unable to read Cookies
 	if c, e := GetEncodedVal(COOKIE_NAME, cookie); e == nil {
-		result.Token = fmt.Sprintf("%s=%s;", COOKIE_NAME, c)
+		result.Token = c
 	}
 
 	controllers.ServeJsonResponseWithCode(w, result, status)
@@ -117,17 +118,21 @@ type CookieAuth struct {
 // Negroni compatible interface
 func (cookieAuth *CookieAuth) ServeHTTP(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
-	cookie, err := ReadCookie(r)
-	if err != nil {
-		fmt.Println(err)
-	}
+	//cookie, err := ReadCookie(r)
+	//if err != nil {
+	////	fmt.Println(err)
+	//}
 	var currentUser core.User
-	//fmt.Println("COOKIES Pass: ", cookie[CONTEXT_USER_KEY])
-	fmt.Println("COOKIES User: ", cookie[CONTEXT_USER])
-	currentUser.ID = cookie[CONTEXT_USER]
-	currentUser.Pass = cookie[CONTEXT_USER_KEY]
-	currentUser.Api = cookie[CONTEXT_API]
-	gcontext.Set(r, CONTEXT_USER, &currentUser)
-	fmt.Println("CURRENT USER: ", currentUser)
+	if hValue := r.Header.Get(TOKEN); len(hValue) > 0 {
+		if val, err := GetDecodeVal(COOKIE_NAME, hValue); err == nil {
+			fmt.Println("COOKIES User: ", val[CONTEXT_USER])
+			currentUser.ID = val[CONTEXT_USER]
+			currentUser.Pass = val[CONTEXT_USER_KEY]
+			currentUser.Api = val[CONTEXT_API]
+			gcontext.Set(r, CONTEXT_USER, &currentUser)
+			fmt.Println("CURRENT USER: ", currentUser)
+		}
+	}
+
 	next(w, r)
 }

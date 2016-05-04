@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/CiscoCloud/shipped-utils/core/controllers"
 	"github.com/gorilla/mux"
-	"github.com/vjscjp/api4/core/controllers"
 )
 
 type HOST_PORT struct {

@@ -2,9 +2,9 @@ package server
 
 import (
 	"fmt"
-	"net/http"
+	http "net/http"
 	"time"
-
+	
 	"github.com/gorilla/securecookie"
 )
 
@@ -17,8 +17,11 @@ const (
 var s = securecookie.New([]byte(HASH_KEY), []byte(BLOCK_KEY))
 
 func SetCookie(w http.ResponseWriter, value map[string]string) {
-	duration := time.Now().Add(time.Minute * 1) // 3 min
+	duration := time.Now().Add(time.Hour * 10) // 3 min
 	setCookieWithName(w, COOKIE_NAME, duration, value)
+	fmt.Println("------")
+	fmt.Println(value)
+	fmt.Println("------")
 }
 
 func ReadCookie(r *http.Request) (map[string]string, error) {
@@ -32,8 +35,9 @@ func DeleteCookie(w http.ResponseWriter) {
 
 func setCookieWithName(w http.ResponseWriter, cookieName string, duration time.Time, value map[string]string) {
 	if cookie := buildCookie(cookieName, duration, value); cookie != nil {
-		fmt.Println("HEADERS")
-		fmt.Println(w.Header())
+		fmt.Println(cookie)
+		//w.Header().Add("X-Cookie",cookie.String())
+		//This function seems doesn't set Cookie in Header
 		http.SetCookie(w, cookie)
 	}
 }
@@ -62,6 +66,14 @@ func buildCookie(cookieName string, duration time.Time, value map[string]string)
 	}
 }
 
+
 func GetEncodedVal(cookieName string, value map[string]string) (string, error) {
 	return s.Encode(cookieName, value)
+}
+
+
+func GetDecodeVal(cookieName string, val string) (map[string]string, error) {
+	value := make(map[string]string)
+	err := s.Decode(cookieName, val, &value)
+	return value, err
 }

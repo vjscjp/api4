@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/CiscoCloud/shipped-utils/core"
 	f "github.com/MustWin/gomarathon"
 	gcontext "github.com/gorilla/context"
-	"github.com/vjscjp/api4/core"
 )
 
 func NewMarathonClient(w http.ResponseWriter, r *http.Request) (client *f.Client, err error) {
