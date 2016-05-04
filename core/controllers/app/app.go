@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/CiscoCloud/shipped-utils/core"
-	"github.com/CiscoCloud/shipped-utils/core/controllers"
+	"github.com/vjscjp/api4/core"
+	"github.com/vjscjp/api4/core/controllers"
 	"github.com/gorilla/mux"
 )
 

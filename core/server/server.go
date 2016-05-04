@@ -3,9 +3,9 @@ package server
 import (
 	"net/http"
 
-	"github.com/CiscoCloud/shipped-utils/core/controllers"
-	"github.com/CiscoCloud/shipped-utils/core/controllers/app"
-	"github.com/CiscoCloud/shipped-utils/core/controllers/host"
+	"github.com/vjscjp/api4/core/controllers"
+	"github.com/vjscjp/api4/core/controllers/app"
+	"github.com/vjscjp/api4/core/controllers/host"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"

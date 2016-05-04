@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/CiscoCloud/shipped-utils/core"
-	"github.com/CiscoCloud/shipped-utils/core/controllers"
+	"github.com/vjscjp/api4/core"
+	"github.com/vjscjp/api4/core/controllers"
 	gcontext "github.com/gorilla/context"
 )
 

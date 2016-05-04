@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/CiscoCloud/shipped-utils/core"
+	"github.com/vjscjp/api4/core"
 	f "github.com/MustWin/gomarathon"
 	gcontext "github.com/gorilla/context"
 )

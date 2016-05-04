@@ -1,6 +1,6 @@
 package main
 
-import "github.com/CiscoCloud/shipped-utils/core/server"
+import "github.com/vjscjp/api4/core/server"
 
 const (
 	Port = "8888"
